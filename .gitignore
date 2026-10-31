@@ -1,0 +1,9 @@
+node_modules/
+.npm-cache/
+.cache/
+*.env
+data/
+*.log
+.playwright-mcp/
+*test*
+config.env

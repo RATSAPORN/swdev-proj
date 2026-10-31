@@ -1,0 +1,283 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#344c3d" />
+    <meta
+      name="description"
+      content="Find a little room to unwind. Explore Bangkok massage studios and manage your next moment of calm with Sabai."
+    />
+    <title>Sabai — A little time for you</title>
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="stylesheet" href="/styles.css" />
+    <script src="/app.js" defer></script>
+  </head>
+  <body>
+    <a class="skip" href="#main">Skip to content</a>
+    <aside class="sidebar">
+      <a class="brand" href="#discover" aria-label="Sabai home"
+        ><svg viewBox="0 0 40 40" aria-hidden="true">
+          <path
+            d="M20 33C5 28 5 15 8 11c7 0 12 9 12 16M20 33c15-5 15-18 12-22-7 0-12 9-12 16M20 28C10 18 15 7 20 3c5 4 10 15 0 25Z"
+          /></svg
+        ><span>sabai<span class="brand-dot">.</span></span></a
+      >
+      <div class="side-caption">A LITTLE TIME FOR YOU</div>
+      <div class="nav-label">YOUR WELLNESS SPACE</div>
+      <nav aria-label="Main navigation">
+        <a href="#discover" class="nav-item active" data-page="discover"
+          ><span data-icon="compass"></span>Discover shops<span
+            class="nav-arrow"
+            >↗</span
+          ></a
+        >
+        <a href="#reservations" class="nav-item" data-page="reservations"
+          ><span data-icon="calendar"></span>My reservations<span
+            id="booking-count"
+            class="count hidden"
+            >0</span
+          ></a
+        >
+        <a href="#guide" class="nav-item" data-page="guide"
+          ><span data-icon="leaf"></span>How it works</a
+        >
+        <a
+          href="#admin"
+          class="nav-item hidden"
+          id="admin-link"
+          data-page="admin"
+          ><span data-icon="grid"></span>Admin dashboard</a
+        >
+      </nav>
+      <div class="sidebar-bottom">
+        <div class="side-note">
+          <span class="little-star">✳</span>
+          <h3>Make space for yourself.</h3>
+          <p>A slower hour can change<br />your whole day.</p>
+          <span class="note-line"></span>
+        </div>
+        <button id="account-button" class="account-button">
+          <span class="avatar" data-icon="user"></span
+          ><span
+            ><strong id="account-name">Your space awaits</strong
+            ><small id="account-detail">Sign in to get started</small></span
+          ><span data-icon="arrow"></span></button
+        ><button id="logout-button" class="text-button hidden">Sign out</button>
+      </div>
+    </aside>
+    <div class="workspace">
+      <header class="topbar">
+        <span class="breadcrumb"
+          >Your everyday escape <span>/</span>
+          <strong id="breadcrumb-page">Discover</strong></span
+        >
+        <div class="top-actions">
+          <span class="location"
+            ><span data-icon="pin"></span>Bangkok, Thailand</span
+          ><button class="button small" id="top-signin">
+            Sign in <span data-icon="arrow"></span>
+          </button>
+        </div>
+      </header>
+      <main id="main" tabindex="-1">
+        <section id="discover-page" class="page">
+          <div class="page-heading">
+            <div>
+              <div class="eyebrow">SLOW DOWN. FEEL BETTER.</div>
+              <h1>Find your moment of <em>calm.</em></h1>
+              <p>
+                Thoughtfully chosen massage spaces. A little closer to feeling
+                like you.
+              </p>
+            </div>
+            <div class="heading-stamp">
+              <span data-icon="sun"></span
+              ><span>A good day<br />to unwind.</span>
+            </div>
+          </div>
+          <section class="hero" aria-label="Take a moment for yourself">
+            <div class="hero-copy">
+              <div class="hero-label">
+                <span></span> YOUR NEXT EXHALE STARTS HERE
+              </div>
+              <h2>Less rush.<br />More <em>rest.</em></h2>
+              <p>
+                Step out of the everyday.<br />Find a space that takes care of
+                you.
+              </p>
+              <a href="#shops" class="hero-link"
+                >Explore the collection <span data-icon="arrow"></span
+              ></a>
+              <div class="hero-foot">
+                <span data-icon="leaf"></span> Rooted in care. Made for you.
+              </div>
+            </div>
+            <div class="hero-photo">
+              <img
+                src="https://images.unsplash.com/photo-1540555700478-4be289fbecef?auto=format&fit=crop&w=1400&q=85"
+                alt="Fresh towels, botanical lotion, and pink flowers in a peaceful spa"
+                fetchpriority="high"
+              />
+              <div class="photo-label">
+                A pause, beautifully spent. <span>SABAI COLLECTION</span>
+              </div>
+            </div>
+          </section>
+          <section id="shops" aria-labelledby="shops-title">
+            <div class="section-heading">
+              <div>
+                <h2 id="shops-title">Good places to slow down</h2>
+                <p>Find the right hands, in the right space.</p>
+              </div>
+              <span class="shop-total" id="shop-total"
+                >Finding your spaces…</span
+              >
+            </div>
+            <div class="search-row">
+              <label class="search"
+                ><span data-icon="search"></span
+                ><input
+                  id="shop-search"
+                  type="search"
+                  placeholder="Search by shop or neighborhood…"
+                  aria-label="Search shops" /></label
+              ><label class="area-select"
+                ><span data-icon="pin"></span
+                ><select id="area-filter" aria-label="Filter by neighborhood">
+                  <option value="">All neighborhoods</option></select
+                ><span data-icon="chevron"></span
+              ></label>
+            </div>
+            <div class="filter-row">
+              <div
+                class="filter-tabs"
+                role="group"
+                aria-label="Filter by treatment"
+              >
+                <button class="filter-chip selected" data-filter="">
+                  All experiences</button
+                ><button class="filter-chip" data-filter="Thai massage">
+                  Thai massage</button
+                ><button class="filter-chip" data-filter="Aromatherapy">
+                  Aromatherapy</button
+                ><button class="filter-chip" data-filter="Foot massage">
+                  Foot massage</button
+                ><button class="filter-chip" data-filter="Deep tissue">
+                  Deep tissue
+                </button>
+              </div>
+              <span class="sort-note"
+                >Curated with care <span data-icon="sparkle"></span
+              ></span>
+            </div>
+            <div id="shop-grid" class="shop-grid" aria-live="polite">
+              <div class="loading-state">Preparing a little calm…</div>
+            </div>
+          </section>
+          <div class="care-strip">
+            <span class="care-icon" data-icon="leaf"></span>
+            <div>
+              <h3>Your time. Your pace.</h3>
+              <p>
+                Reserve up to 3 moments of calm. Easily reschedule when life
+                happens.
+              </p>
+            </div>
+            <a href="#guide"
+              >A little guidance <span data-icon="arrow"></span
+            ></a>
+          </div>
+        </section>
+        <section id="reservations-page" class="page hidden">
+          <div class="page-heading">
+            <div>
+              <div class="eyebrow">SOMETHING TO LOOK FORWARD TO</div>
+              <h1>Your moments of <em>calm.</em></h1>
+              <p>A little time set aside, just for you.</p>
+            </div>
+            <a href="#discover" class="button"
+              >Explore shops <span data-icon="plus"></span
+            ></a>
+          </div>
+          <div id="reservations-content"></div>
+        </section>
+        <section id="admin-page" class="page hidden">
+          <div class="page-heading">
+            <div>
+              <div class="eyebrow">SABAI · ADMINISTRATION</div>
+              <h1>Every reservation.<br /><em>One thoughtful space.</em></h1>
+              <p>View, reschedule, and manage reservations for all guests.</p>
+            </div>
+          </div>
+          <label class="search admin-search"
+            ><span data-icon="search"></span
+            ><input
+              id="admin-search"
+              type="search"
+              placeholder="Search guest, shop, or email…"
+              aria-label="Search all reservations"
+          /></label>
+          <div id="admin-content"></div>
+        </section>
+        <section id="guide-page" class="page hidden">
+          <div class="page-heading">
+            <div>
+              <div class="eyebrow">A LITTLE GUIDANCE</div>
+              <h1>Less planning.<br /><em>More peace of mind.</em></h1>
+              <p>Your next moment of calm, in three simple steps.</p>
+            </div>
+          </div>
+          <div class="guide-grid">
+            <article>
+              <span>01</span>
+              <h2>Find your space</h2>
+              <p>
+                Explore our collection by neighborhood or treatment. Each shop
+                includes its address, telephone number, and opening hours.
+              </p>
+            </article>
+            <article>
+              <span>02</span>
+              <h2>Make time for you</h2>
+              <p>
+                Create your account and choose a treatment, date, and time. You
+                can hold up to three upcoming reservations at once.
+              </p>
+            </article>
+            <article>
+              <span>03</span>
+              <h2>Come as you are</h2>
+              <p>
+                View everything in My reservations. Plans change? Reschedule or
+                cancel any upcoming visit in a few clicks.
+              </p>
+            </article>
+          </div>
+          <div class="guide-note">
+            <h2>A few things to know</h2>
+            <p>
+              All appointment times are in Bangkok time (ICT, UTC+7). Treatments
+              must finish before the shop closes. Prices are shown in Thai baht;
+              payment is made at the shop.
+            </p>
+            <p>
+              This local project includes six fictional sample shops. It does
+              not send appointments to real businesses.
+            </p>
+            <a class="button" href="#discover"
+              >Find your moment <span data-icon="arrow"></span
+            ></a>
+          </div>
+        </section>
+        <footer>
+          <a class="footer-brand" href="#discover">sabai.</a
+          ><span>A little time for you. A little better every day.</span
+          ><span>Bangkok, with care <span class="footer-flower">✳</span></span>
+        </footer>
+      </main>
+    </div>
+    <dialog id="modal"><div id="modal-content"></div></dialog>
+    <div id="toast" role="status" class="toast hidden"></div>
+  </body>
+</html>
