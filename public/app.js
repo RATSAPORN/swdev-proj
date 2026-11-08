@@ -253,7 +253,7 @@ function renderShops() {
             hour12: false,
           }).format(new Date());
           const open = clock >= s.opens && clock < s.closes;
-          return `<article class="shop-card"><div class="card-photo"><img src="${image(s)}" alt="${escape(s.name)} — spa atmosphere" loading="lazy"><span class="photo-chip">${icon("leaf")} ${i === 0 ? "A SABAI FAVORITE" : "SELECTED WITH CARE"}</span><span class="card-number">0${state.shops.indexOf(s) + 1}</span></div><div class="card-body"><div class="shop-meta"><h3>${escape(s.name)}</h3><span><i class="status-dot"></i>${open ? "Open now" : "Opens " + s.opens}</span></div><div class="card-location">${icon("pin")} ${escape(s.neighborhood)}, Bangkok</div><p class="card-description">${escape(s.description)}</p><div class="tags">${s.tags.map((tag) => `<span>${escape(tag)}</span>`).join("")}</div><div class="card-bottom"><div class="price">From <strong>${money(min)}</strong> <small>/ session</small></div><button class="book-link" data-book="${s._id}">View & reserve ${icon("arrow")}</button></div></div></article>`;
+          return `<article class="shop-card"><div class="card-photo"><img src="${image(s)}" alt="${escape(s.name)} — spa atmosphere" loading="lazy"><span class="photo-chip">${icon("leaf")} ${i === 0 ? "A SABAI FAVORITE" : "SELECTED WITH CARE"}</span><span class="card-number">0${state.shops.indexOf(s) + 1}</span></div><div class="card-body"><div class="shop-meta"><h3>${escape(s.name)}</h3><span><i class="status-dot"></i>${open ? "Open now" : "Opens " + s.opens}</span></div><div class="card-location">${icon("pin")} ${escape(s.neighborhood)}, Bangkok</div><p class="card-license">${icon("check")} License ${escape(s.license || "-")}</p><p class="card-description">${escape(s.description)}</p><div class="tags">${s.tags.map((tag) => `<span>${escape(tag)}</span>`).join("")}</div><div class="card-bottom"><div class="price">From <strong>${money(min)}</strong> <small>/ session</small></div><button class="book-link" data-book="${s._id}">View & reserve ${icon("arrow")}</button></div></div></article>`;
         })
         .join("")
     : `<div class="empty-state"><span>${icon("search")}</span><h2>A little further afield?</h2><p>No shops match these filters. Try another neighborhood or experience.</p><button class="button secondary" id="reset-filters">Clear filters</button></div>`;
@@ -294,37 +294,66 @@ function bookingModal(shopId, reservation = null) {
     shop.tags.includes(s.category),
   );
   openModal(
-    `<img class="booking-photo" src="${image(shop)}" alt="Spa atmosphere at ${escape(shop.name)}"><div class="modal-body"><div class="modal-eyebrow">${reservation ? "A LITTLE CHANGE OF PLANS" : "MAKE SPACE FOR YOURSELF"}</div><h2>${escape(shop.name)}</h2><div class="shop-info"><span>${icon("pin")} ${escape(shop.address)}</span><span>${icon("phone")} ${escape(shop.telephone)}</span><span>${icon("clock")} Open daily ${shop.opens}–${shop.closes} · Bangkok time</span></div><form id="booking-form">${errorBox}${reservation ? `<label class="field">Massage shop<select name="shop" id="booking-shop">${state.shops.map((s) => `<option value="${s._id}" ${s._id === shopId ? "selected" : ""}>${escape(s.name)}</option>`).join("")}</select></label>` : ""}<label class="field">Your experience<select name="service" id="booking-service">${available.map((s) => `<option value="${s.id}" ${reservation?.service === s.id ? "selected" : ""}>${escape(s.name)}</option>`).join("")}</select><small id="service-description"></small></label><div class="form-row"><label class="field">Treatment length<select name="duration" id="booking-duration"></select></label><label class="field">Your date<input name="date" id="booking-date" type="date" min="${today()}" value="${reservation?.date || ""}" required></label></div><label class="field">Start time <select name="time" id="booking-time" required></select><small>All times are in Bangkok time (ICT). Please arrive 10 minutes early.</small></label><div class="booking-summary"><span>Your moment of calm<br><small>Pay directly at the shop</small></span><strong id="booking-price"></strong></div><button class="button form-submit" type="submit">${reservation ? "Save changes" : "Confirm reservation"} ${icon("arrow")}</button><p class="modal-fine">No online payment needed. Up to 3 upcoming reservations.</p></form></div>`,
+    `<img class="booking-photo" src="${image(shop)}" alt="Spa atmosphere at ${escape(shop.name)}"><div class="modal-body"><div class="modal-eyebrow">${reservation ? "A LITTLE CHANGE OF PLANS" : "MAKE SPACE FOR YOURSELF"}</div><h2>${escape(shop.name)}</h2><div class="shop-info"><span>${icon("pin")} ${escape(shop.address)}</span><span>${icon("phone")} ${escape(shop.telephone)}</span><span>${icon("clock")} Open daily ${shop.opens}–${shop.closes} · Bangkok time</span><span>${icon("check")} License ${escape(shop.license || "-")}</span></div><form id="booking-form">${errorBox}${reservation ? `<label class="field">Massage shop<select name="shop" id="booking-shop">${state.shops.map((s) => `<option value="${s._id}" ${s._id === shopId ? "selected" : ""}>${escape(s.name)}</option>`).join("")}</select></label>` : ""}<label class="field">Your experience<select name="service" id="booking-service">${available.map((s) => `<option value="${s.id}" ${reservation?.service === s.id ? "selected" : ""}>${escape(s.name)}</option>`).join("")}</select><small id="service-description"></small></label><div class="form-row"><label class="field">Treatment length<select name="duration" id="booking-duration"></select></label><label class="field">Your date<input name="date" id="booking-date" type="date" min="${today()}" value="${reservation?.date || ""}" required></label></div><div class="field">Start time<input type="hidden" name="time" id="booking-time"><div class="time-grid" id="time-grid"></div><small>All times are in Bangkok time (ICT). Please arrive 10 minutes early.</small></div><label class="field">Special requests (Optional)<textarea name="notes" id="booking-notes" rows="2" maxlength="500" placeholder="Preferred masseuse gender, injuries, or areas to avoid...">${escape(reservation?.notes || "")}</textarea></label><div class="booking-summary"><span>Your moment of calm<br><small>Pay directly at the shop</small></span><strong id="booking-price"></strong></div><button class="button form-submit" type="submit">${reservation ? "Save changes" : "Confirm reservation"} ${icon("arrow")}</button><p class="modal-fine">No online payment needed. Up to 3 upcoming reservations.</p></form></div>`,
   );
-  function updateTimes() {
-    const selected = $("#booking-time").value;
+    const addMinutes = (time, mins) => {
+    const t = Number(time.slice(0, 2)) * 60 + Number(time.slice(3)) + mins;
+    return `${String(Math.floor(t / 60)).padStart(2, "0")}:${String(t % 60).padStart(2, "0")}`;
+  };
+  let timesRequest = 0;
+  async function updateTimes() {
+    const date = $("#booking-date").value;
     const duration = Number($("#booking-duration").value);
-    const start =
-      Number(shop.opens.slice(0, 2)) * 60 + Number(shop.opens.slice(3));
-    const end =
-      Number(shop.closes.slice(0, 2)) * 60 + Number(shop.closes.slice(3));
-    const times = [];
-    for (let minutes = start; minutes + duration <= end; minutes += 30) {
-      const time = `${String(Math.floor(minutes / 60)).padStart(2, "0")}:${String(minutes % 60).padStart(2, "0")}`;
-      if (
-        $("#booking-date").value &&
-        new Date(`${$("#booking-date").value}T${time}:00+07:00`) <= new Date()
-      )
-        continue;
-      times.push(time);
-    }
-    $("#booking-time").innerHTML = times.length
-      ? times
-          .map(
-            (t) =>
-              `<option value="${t}" ${t === (selected || reservation?.time) ? "selected" : ""}>${t}</option>`,
-          )
-          .join("")
-      : '<option value="">No times left — choose another date</option>';
+    const selected = $("#booking-time").value || reservation?.time;
     const service = state.services.find(
       (s) => s.id === $("#booking-service").value,
     );
     $("#booking-price").textContent = money(service.prices[duration]);
+    const submit = $("button[type=submit]", $("#booking-form"));
+    const grid = $("#time-grid");
+    const hidden = $("#booking-time");
+    const message = (text) => {
+      grid.innerHTML = `<p class="time-empty">${text}</p>`;
+      hidden.value = "";
+      submit.disabled = true;
+    };
+    if (!date) return message("Choose a date first");
+    const request = ++timesRequest;
+    message("Loading times…");
+    try {
+      const query = new URLSearchParams({ date, duration });
+      if (reservation?._id) query.set("exclude", reservation._id);
+      const { data: slots } = await api(
+        `/shops/${shop._id}/availability?${query}`,
+      );
+      if (request !== timesRequest) return; // ignore stale responses
+      const pick =
+        slots.find((s) => s.time === selected && s.available)?.time ||
+        slots.find((s) => s.available)?.time;
+      if (!pick) return message("No times left — choose another date");
+      hidden.value = pick;
+      submit.disabled = false;
+      grid.innerHTML = slots
+        .map(
+          (s) =>
+            `<button type="button" class="time-slot${s.time === pick ? " selected" : ""}" data-time="${s.time}" aria-pressed="${s.time === pick}" ${s.available ? "" : "disabled"}><strong>${s.time}–${addMinutes(s.time, duration)}</strong><small>${s.available ? `${s.remaining} slot${s.remaining === 1 ? "" : "s"} available` : "Fully booked"}</small></button>`,
+        )
+        .join("");
+      $$(".time-slot", grid).forEach(
+        (b) =>
+          (b.onclick = () => {
+            hidden.value = b.dataset.time;
+            $$(".time-slot", grid).forEach((x) => {
+              x.classList.toggle("selected", x === b);
+              x.setAttribute("aria-pressed", x === b);
+            });
+          }),
+      );
+    } catch (error) {
+      if (request !== timesRequest) return;
+      message("Unable to load times");
+      formError($("#booking-form"), error.message);
+    }
   }
   function updateDurations() {
     const service = state.services.find(
@@ -396,7 +425,7 @@ function reservationCards(items, admin = false) {
       const s = r.shop,
         service = state.services.find((s) => s.id === r.service),
         upcoming = new Date(r.endsAt) > new Date();
-      return `<article class="reservation-card"><img src="${image(s, 400)}" alt="${escape(s.name)} spa" loading="lazy"><div class="reservation-detail"><div class="reservation-top"><div><div class="eyebrow">${escape(s.neighborhood)} · BANGKOK</div><h2>${escape(s.name)}</h2></div><span class="reservation-badge">${upcoming ? "Confirmed" : "Completed"}</span></div><p>${escape(service?.name)} · ${r.duration} minutes · ${money(r.price)}</p><p>${icon("calendar")} ${formattedDate(r.date)} &nbsp; ${r.time} ICT</p><p>${icon("pin")} ${escape(s.address)}</p><p>${icon("phone")} ${escape(s.telephone)}</p>${admin ? `<div class="guest-info"><strong>${escape(r.user?.name)}</strong> · ${escape(r.user?.email)} · ${escape(r.user?.telephone)}</div>` : ""}<div class="reservation-actions"><button class="button secondary" data-edit="${r._id}" data-admin="${admin}">Reschedule</button><button class="cancel-button" data-delete="${r._id}" data-admin="${admin}">${upcoming ? "Cancel reservation" : "Delete record"}</button></div></div></article>`;
+      return `<article class="reservation-card"><img src="${image(s, 400)}" alt="${escape(s.name)} spa" loading="lazy"><div class="reservation-detail"><div class="reservation-top"><div><div class="eyebrow">${escape(s.neighborhood)} · BANGKOK</div><h2>${escape(s.name)}</h2></div><span class="reservation-badge">${upcoming ? "Confirmed" : "Completed"}</span></div><p>${escape(service?.name)} · ${r.duration} minutes · ${money(r.price)}</p><p>${icon("calendar")} ${formattedDate(r.date)} &nbsp; ${r.time} ICT</p><p>${icon("pin")} ${escape(s.address)}</p><p>${icon("phone")} ${escape(s.telephone)}</p>${r.notes ? `<div style="margin-top: 12px; padding: 12px; background: rgba(0,0,0,0.03); border-radius: 6px; font-size: 0.9em;"><strong>Notes:</strong> ${escape(r.notes)}</div>` : ""}${admin ? `<div class="guest-info"><strong>${escape(r.user?.name)}</strong> · ${escape(r.user?.email)} · ${escape(r.user?.telephone)}</div>` : ""}<div class="reservation-actions"><button class="button secondary" data-edit="${r._id}" data-admin="${admin}">Reschedule</button><button class="cancel-button" data-delete="${r._id}" data-admin="${admin}">${upcoming ? "Cancel reservation" : "Delete record"}</button></div></div></article>`;
     })
     .join("");
 }
@@ -545,7 +574,7 @@ renderPage();
 async function initialize() {
   try {
     const [catalog, auth] = await Promise.all([api("/shops"), api("/auth/me")]);
-    state.shops = catalog.shops;
+    state.shops = catalog.data;
     state.services = catalog.services;
     state.user = auth.user;
     $("#area-filter").innerHTML =

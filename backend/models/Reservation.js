@@ -11,6 +11,7 @@ const schema = new Schema(
     service: String,
     duration: Number,
     price: Number,
+    notes: { type: String, trim: true, maxlength: 500, default: "" },
     slot: { type: Number, min: 1, max: 3 },
     active: { type: Boolean, default: true },
   },

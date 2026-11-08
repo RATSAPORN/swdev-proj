@@ -22,4 +22,5 @@ export const booking = z.object({
   time: z.string().regex(/^(?:[01]\d|2[0-3]):(?:00|30)$/),
   service: z.string(),
   duration: z.number().int(),
+  notes: z.string().trim().max(500).optional().default(""),
 });

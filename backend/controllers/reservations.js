@@ -3,7 +3,7 @@ import { Shop, Reservation } from "../models/index.js";
 import { services } from "../config/catalog.js";
 import { booking } from "../config/validation.js";
 import { fail } from "../utils/error.js";
-const validatedBooking = async (body) => {
+const validatedBooking = async (body, excludeId = null) => {
   const data = booking.parse(body);
   const shop = await Shop.findById(data.shop);
   if (!shop) throw fail(404, "This shop could not be found.");
@@ -28,10 +28,20 @@ const validatedBooking = async (body) => {
     minute(data.time) + data.duration > minute(shop.closes)
   )
     throw fail(400, "The treatment must fit within shop opening hours.");
+    const endsAt = new Date(+startsAt + data.duration * 60000);
+    const taken = await Reservation.countDocuments({
+      shop: shop._id,
+      active: true,
+      startsAt: { $lt: endsAt },
+      endsAt: { $gt: startsAt },
+      ...(excludeId ? { _id: { $ne: excludeId } } : {}),
+    });
+    if (taken >= shop.capacity)
+      throw fail(409, "This time slot is fully booked. Please choose another time.");
   return {
     ...data,
     startsAt,
-    endsAt: new Date(+startsAt + data.duration * 60000),
+    endsAt,
     price: service.prices[data.duration],
   };
 };
@@ -95,7 +105,7 @@ export const createReservation = async (req, res) => {
 };
 export const updateReservation = async (req, res) => {
   const item = await ownedReservation(req);
-  const data = await validatedBooking(req.body);
+  const data = await validatedBooking(req.body, item._id);
   res.json({
     reservation: await placeReservation(item.user, data, item._id),
   });

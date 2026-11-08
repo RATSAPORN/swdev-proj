@@ -27,7 +27,16 @@ export async function connectDatabase({ temporary = false } = {}) {
   }
   await mongoose.connect(uri);
   await Promise.all([User.init(), Shop.init(), Reservation.init()]);
-  if ((await Shop.countDocuments()) === 0) await Shop.insertMany(shops);
+  //if ((await Shop.countDocuments()) === 0) await Shop.insertMany(shops);
+  await Shop.bulkWrite(
+  shops.map((s) => ({
+    updateOne: {
+      filter: { name: s.name },
+      update: { $set: s },
+      upsert: true,
+    },
+  })),
+);
   if (!temporary && process.env.ADMIN_EMAIL && process.env.ADMIN_PASSWORD) {
     if (process.env.ADMIN_PASSWORD.length < 12)
       throw new Error("ADMIN_PASSWORD must be at least 12 characters.");
@@ -41,6 +50,7 @@ export async function connectDatabase({ temporary = false } = {}) {
         role: "admin",
       });
   }
+  console.log("📌 My MongoDB URI is:", uri);
   return {
     uri,
     close: async () => {
